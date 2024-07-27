@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Student Enrollment</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<style>
+    .container{
+        
+        background-color: rgb(247, 247, 98);
+        padding: 20px;
+        height: 50vh;
+    }
+    button{
+        width: 100px;
+        height: 30px;
+        background-color: #4CAF50;
+        border-radius: 10px;
+       font-weight: bolder; 
+        }
+</style>
+<body>
+    <div class="container">
+    <h1>Student Enrollment</h1>
+    <form id="studentForm" method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Register</button>
+    </form>
+    <div id="result"></div>
+    <br>
+    <a href="{% url 'generate_csv' %}">Download CSV</a>
+    <br>
+    <a href="{% url 'generate_pdf' %}">Download PDF</a>
+    </div>
+    <script>
+        $(document).ready(function(){
+            $('#studentForm').on('submit', function(event){
+                event.preventDefault();
+                $.ajax({
+                    url: "{% url 'register_student' %}",
+                    method: "POST",
+                    data: $(this).serialize(),
+                    success: function(response){
+                        if(response.status == 'success'){
+                            $('#result').html('<p>Student registered successfully!</p>');
+                            $('#studentForm')[0].reset();
+                        } else {
+                            $('#result').html('<p>Error: ' + JSON.stringify(response.errors) + '</p>');
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
